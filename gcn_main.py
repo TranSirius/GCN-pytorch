@@ -9,28 +9,47 @@ from utils.preprocess import *
 from utils.torch_utils import *
 from models.gcn_model import *
 
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+import argparse
 
-adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = load_data('cora')
+def parse_args():
+    parser = argparse.ArgumentParser(description="GCN - pytorch.")
+    parser.add_argument('-dataset', nargs = '?', default = 'cora', help = 'Select your dataset')
+    parser.add_argument('-epoch', type = int, default = 1000, help = 'maximum epoch, default is 1000')
+    parser.add_argument('-early', type = int, default = 100, help = 'early stop, default is 100')
+    parser.add_argument('-device', nargs = '?', default = 'cpu', help = 'which devices used to train, default is cpu')
+    parser.add_argument('-lr', type = float, default = 0.01, help = 'learning rate')
+    parser.add_argument('-weight', type = float, default = 5e-4, help = 'weight decay')
+    parser.add_argument('-hidden', nargs = '?', default = '16, 7', help = 'hidden layer size, split by comma')
+    parser.add_argument('-layer', type = int, default = 2, help = 'layer number')
+    return parser.parse_args()
+
+args = parse_args()
+device = 'cuda'
+if args.device == 'cpu':
+    device = 'cpu'
+
+adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = load_data(args.dataset)
 
 laplacian = sp_sym_normalize(adj + sp.eye(adj.shape[0])).toarray()
-laplacian = torch.tensor(laplacian, dtype = torch.float32).to('cuda')
+laplacian = torch.tensor(laplacian, dtype = torch.float32).to(device)
 
 features = sp_row_normalize(features).toarray()
-features = torch.tensor(features, dtype = torch.float32).to('cuda')
+features = torch.tensor(features, dtype = torch.float32).to(device)
 
-y_train = torch.tensor(y_train, dtype = torch.float32).to('cuda')
-y_val   = torch.tensor(y_val,   dtype = torch.float32).to('cuda')
-y_test  = torch.tensor(y_test,  dtype = torch.float32).to('cuda')
+y_train = torch.tensor(y_train, dtype = torch.float32).to(device)
+y_val   = torch.tensor(y_val,   dtype = torch.float32).to(device)
+y_test  = torch.tensor(y_test,  dtype = torch.float32).to(device)
 
 
-layer_num = 2
-hid_dims = [16, 7]
+layer_num = args.layer
+hid_dims_str = args.hidden.split(',')
+if len(hid_dims_str) < layer_num - 1:
+    print('hidden size error')
+hid_dims = [int(i) for i in hid_dims_str]
 heads = [8, 8]
-early_stop = 100
-weight_decay = 5e-4
-learning_rate = 0.01
+early_stop = args.early
+weight_decay = args.weight
+learning_rate = args.lr
 
 Model = GCN
 model = Model(
@@ -40,8 +59,10 @@ model = Model(
     layer_num = layer_num,
     heads = heads,
     hid_dims = hid_dims,
-    drop_rate = 0.5
+    drop_rate = 0.5,
+    device = device
 )
+model = model.to(device)
 optimizer = optim.Adam(model.parameters(), lr = learning_rate)
 model.train()
 
@@ -56,7 +77,7 @@ acc_max = 0
 loss_min = 100
 tolerence = 0
 save_file = 'pretrained/gcn'
-for epk in range(1000):
+for epk in range(args.epoch):
     model.train()
     optimizer.zero_grad()
     logits = model(features)

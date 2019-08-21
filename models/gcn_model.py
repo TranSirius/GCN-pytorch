@@ -6,7 +6,7 @@ import scipy.sparse as sp
 from models.layers.gcn_head import *
 
 class GCN(nn.Module):
-    def __init__(self, laplacian, features_dim, class_num, layer_num, heads, hid_dims, non_linear = nn.LeakyReLU(), drop_rate = 0.5):
+    def __init__(self, laplacian, features_dim, class_num, layer_num, heads, hid_dims, non_linear = nn.LeakyReLU(), drop_rate = 0.5, device = 'cuda'):
         super(GCN, self).__init__()
         self.laplacian = laplacian
 
@@ -32,9 +32,9 @@ class GCN(nn.Module):
                     out_dim = out_dim, 
                     non_linear = func, 
                     bias = False,
-                    drop_rate = drop_rate
+                    drop_rate = drop_rate,
+                    device = device
                 )
-
                 head_list.append(gcn_head)
             
             self.layers.append(head_list)

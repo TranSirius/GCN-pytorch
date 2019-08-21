@@ -24,3 +24,33 @@ It should be notified that I am not the author of GCN. You might cite this work 
 This model could achieve an average accuracy tested on Cora at <img src="https://latex.codecogs.com/gif.latex?82.0&space;\pm&space;0.8&space;\%" title="82.0 \pm 0.8 \%" />
 
 ## How to run our code
+
+### Requirements
+Before running our codes, please make sure these dependencies is installed in your environment
+
+1. numpy==1.16.4
+2. torch==1.1.0
+3. scipy==1.3.0
+4. networkx==2.3
+
+by
+```bash
+python -m pip install -r requirements.txt
+```
+
+### Evaluating on Cora, Citeseer, Pubmed
+You may run 
+```bash
+python gcn_main.py [-h] [-dataset [DATASET]] [-epoch EPOCH] [-early EARLY]
+                   [-device [DEVICE]] [-lr LR] [-weight WEIGHT]
+                   [-hidden [HIDDEN]] [-layer LAYER]
+```
+
+-dataset            you should use one of 'cora', 'pubmed', 'citeseer'. Default is cora
+-epoch              maximum epoch, default is 1000
+-early              early stop, default is 100
+-device             which devices used to train, default is cpu
+-lr                 learning rate, default is 0.01
+-weight             weight decay, default is 5e-4
+-hidden             hidden layer size, split by comma, default is 16
+-layer              layer number, default is 2
