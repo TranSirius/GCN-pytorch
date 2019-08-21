@@ -25,8 +25,6 @@ For any questions, please feel free to open an issue. You may expect my response
 It should be notified that I am not the author of GCN. You might cite this work according to [Tensorflow-Version](https://github.com/tkipf/gcn).
 
 ## Performance
-This model could achieve an average accuracy tested on Cora at 
-
-<img src="https://latex.codecogs.com/gif.latex?82.0&space;\pm&space;0.8&space;\%" title="82.0 \pm 0.8 \%" />
+This model could achieve an average accuracy tested on Cora at <img src="https://latex.codecogs.com/gif.latex?82.0&space;\pm&space;0.8&space;\%" title="82.0 \pm 0.8 \%" />
 
 ## How to run our code
