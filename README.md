@@ -8,6 +8,7 @@ There are minor differences, including:
 
 1. Add multiheads to each layers
 2. Dropout is applied not only to the input of each layer, but also to the symmetrically normalized Laplacian matrix in each head
+3. We leverage a GAT style early stop mechanism, which can greatly enhance the performance
 
 I have conducted experients on Tensorflow. It shows that additional dropout mechanism could enhance the performance of the original algorithm to 82% tested on Cora.
 
@@ -22,3 +23,10 @@ For any questions, please feel free to open an issue. You may expect my response
 
 ## Notification
 It should be notified that I am not the author of GCN. You might cite this work according to [Tensorflow-Version](https://github.com/tkipf/gcn).
+
+## Performance
+This model could achieve an average accuracy tested on Cora at 
+
+<img src="https://latex.codecogs.com/gif.latex?82.0&space;\pm&space;0.8&space;\%" title="82.0 \pm 0.8 \%" />
+
+## How to run our code

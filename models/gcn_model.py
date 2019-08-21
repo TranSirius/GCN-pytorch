@@ -6,7 +6,7 @@ import scipy.sparse as sp
 from models.layers.gcn_head import *
 
 class GCN(nn.Module):
-    def __init__(self, laplacian, features_dim, class_num, layer_num, heads, hid_dims, non_linear = nn.ReLU(), drop_rate = 0.5):
+    def __init__(self, laplacian, features_dim, class_num, layer_num, heads, hid_dims, non_linear = nn.LeakyReLU(), drop_rate = 0.5):
         super(GCN, self).__init__()
         self.laplacian = laplacian
 

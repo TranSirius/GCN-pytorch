@@ -7,8 +7,9 @@ class GcnHead(nn.Module):
         self.laplacian = torch.tensor(laplacian, dtype = torch.float32).to('cuda')
 
         self.affine = nn.Linear(in_dim, out_dim, bias = bias).to('cuda')
+        nn.init.xavier_normal_(self.affine.weight)
         self.non_linear = non_linear
-        self.dropout = nn.Dropout(drop_rate,).to('cuda')
+        self.dropout = nn.Dropout(drop_rate).to('cuda')
 
     def forward(self, features):
         features = self.dropout(features)

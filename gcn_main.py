@@ -7,20 +7,28 @@ import torch.optim as optim
 from utils.data_utils import *
 from utils.preprocess import *
 from utils.torch_utils import *
-from models.gcn import *
+from models.gcn_model import *
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '7'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = load_data('cora')
-laplacian = torch.tensor(sp_sym_normalize(adj + sp.eye(int(adj.shape[0]))).toarray(), dtype = torch.float32).to('cuda')
-features = torch.tensor(sp_row_normalize(features).toarray(), dtype = torch.float32).to('cuda')
-y_train, y_val, y_test = torch.tensor(y_train, dtype = torch.float32).to('cuda'), torch.tensor(y_val, dtype = torch.float32).to('cuda'), torch.Tensor(y_test).to('cuda')
 
-layer_num = 2 
+laplacian = sp_sym_normalize(adj + sp.eye(adj.shape[0])).toarray()
+laplacian = torch.tensor(laplacian, dtype = torch.float32).to('cuda')
+
+features = sp_row_normalize(features).toarray()
+features = torch.tensor(features, dtype = torch.float32).to('cuda')
+
+y_train = torch.tensor(y_train, dtype = torch.float32).to('cuda')
+y_val   = torch.tensor(y_val,   dtype = torch.float32).to('cuda')
+y_test  = torch.tensor(y_test,  dtype = torch.float32).to('cuda')
+
+
+layer_num = 2
 hid_dims = [16, 7]
-heads = [1, 1]
-early_stop = 10
+heads = [8, 8]
+early_stop = 100
 weight_decay = 5e-4
 learning_rate = 0.01
 
@@ -44,15 +52,20 @@ for i in model.named_parameters():
 
 vl_ls = []
 vl_ac = []
+acc_max = 0
+loss_min = 100
 tolerence = 0
+save_file = 'pretrained/gcn'
 for epk in range(1000):
     model.train()
     optimizer.zero_grad()
     logits = model(features)
+    
     loss = logits_masked_loss(logits, y_train, train_mask)
     L2loss = sum([torch.norm(i[1], p = 2) * torch.norm(i[1], p = 2) for i in L2List])
     (loss + L2loss * weight_decay).backward()
     optimizer.step()
+
     train_ls = loss.item()
     train_ac = masked_acc(logits, y_train, train_mask).item()
 
@@ -65,8 +78,12 @@ for epk in range(1000):
     vl_ac.append(val_acc)
 
     if epk > early_stop:
-        if val_ls < np.min(vl_ls[-early_stop:-1]) or val_acc > np.max(vl_ac[-early_stop:-1]):
+        if val_ls < loss_min or val_acc > acc_max:
+            if val_ls < loss_min and val_acc > acc_max:
+                torch.save(model.state_dict(), save_file)
             tolerence = 0
+            loss_min = min(loss_min, val_ls)
+            acc_max = max(acc_max, val_acc)
         else:
             tolerence += 1
             if tolerence > early_stop:
@@ -82,6 +99,7 @@ for epk in range(1000):
         )
     )
 
+model.load_state_dict(torch.load(save_file))
 model.eval()
 logits = model(features)
 loss = logits_masked_loss(logits, y_test, test_mask)
