@@ -10,10 +10,6 @@ There are minor differences, including:
 2. Dropout is applied not only to the input of each layer, but also to the symmetrically normalized Laplacian matrix in each head
 3. We leverage a GAT style early stop mechanism, which can greatly enhance the performance
 
-I have conducted experients on Tensorflow. It shows that additional dropout mechanism could enhance the performance of the original algorithm to 82% tested on Cora.
-
-However, this version is not as good as I expected. Improvement might be done in the near future.
-
 For any questions, please feel free to open an issue. You may expect my response in less than 7 days.
 
 ## Future Works
