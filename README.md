@@ -46,11 +46,11 @@ python gcn_main.py [-h] [-dataset [DATASET]] [-epoch EPOCH] [-early EARLY]
                    [-hidden [HIDDEN]] [-layer LAYER]
 ```
 
--dataset            you should use one of 'cora', 'pubmed', 'citeseer'. Default is cora
--epoch              maximum epoch, default is 1000
--early              early stop, default is 100
--device             which devices used to train, default is cpu
--lr                 learning rate, default is 0.01
--weight             weight decay, default is 5e-4
--hidden             hidden layer size, split by comma, default is 16
--layer              layer number, default is 2
+- -dataset            you should use one of 'cora', 'pubmed', 'citeseer'. Default is cora
+- -epoch              maximum epoch, default is 1000
+- -early              early stop, default is 100
+- -device             which devices used to train, default is cpu
+- -lr                 learning rate, default is 0.01
+- -weight             weight decay, default is 5e-4
+- -hidden             hidden layer size, split by comma, default is 16
+- -layer              layer number, default is 2
